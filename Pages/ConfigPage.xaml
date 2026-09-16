@@ -1,0 +1,500 @@
+﻿<Page x:Class="PcbInspection.Pages.ConfigPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:models="clr-namespace:PcbInspection.Models"
+      xmlns:converters="clr-namespace:PcbInspection.Converters"
+      Title="ConfigPage"
+      Background="#F0F2F5"
+      Height="1080">
+    <Page.Resources>
+        <converters:EnumDescriptionConverter x:Key="EnumDescConverter"/>
+        <ObjectDataProvider x:Key="AlgorithmEnumValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:InspectionAlgorithm"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Page.Resources>
+    <Grid Width="1126">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <!-- ========================================================= -->
+        <!-- 左侧：系统配置与项目管理 -->
+        <!-- ========================================================= -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto"  Margin="0,0,15,0">
+            <Grid MaxWidth="800" HorizontalAlignment="Left">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!-- ================================================= -->
+                <!-- 系统与硬件配置标题 -->
+                <!-- ================================================= -->
+                <TextBlock Grid.Row="0" Text="⚙️ 系统与硬件配置" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15"/>
+                <!-- ================================================= -->
+                <!-- 权限提示 -->
+                <!-- ================================================= -->
+                <Border Grid.Row="1"  x:Name="BorderRoleTip"  Background="#FFF3CD"  BorderBrush="#FFEEBA"  BorderThickness="1" CornerRadius="4"
+                        Padding="10,8"  Margin="0,0,0,15"  Visibility="Collapsed">
+                    <TextBlock Text="🔒 当前登录身份为【操作员】，配置界面仅供查看，如需修改请切换为管理员账号。"
+                               Foreground="#856404"  FontSize="13"   FontWeight="SemiBold"/>
+                </Border>
+                <!-- ================================================= -->
+                <!-- 硬件配置 -->
+                <!-- ================================================= -->
+                <Border Grid.Row="2" x:Name="ConfigContainer" Background="White" CornerRadius="8"  Padding="20" Margin="10,0,0,15">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#DDDDDD"  BlurRadius="10" ShadowDepth="1"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="工业相机设置" FontSize="16" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,15"/>
+                        <Grid Grid.Row="1" Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="设备选择：" VerticalAlignment="Center"  FontSize="14"  Foreground="#2C3E50"/>
+                            <ComboBox Grid.Column="1"  x:Name="CmbCameras" Height="36" FontSize="14"  DisplayMemberPath="Name"
+                                      SelectedValuePath="MonikerString" VerticalContentAlignment="Center"  Margin="0,0,10,0"/>
+                            <Button Grid.Column="2" Content="刷新扫描" Height="36" Background="#3498DB"
+                                    Foreground="White" FontSize="13" Click="BtnRefresh_Click"/>
+                        </Grid>
+                        <TextBlock Grid.Row="2" x:Name="TxtStatus" Text="提示：选择后点击保存，下次系统启动将自动绑定该相机。"
+                                   Foreground="#7F8C8D" FontSize="12" Margin="100,10,0,0"/>
+                        <Grid Grid.Row="3" Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"  x:Name="FixX" Text="0" Width="90" Height="26" TextChanged="FixX_TextChanged"/>
+                            <TextBox Grid.Column="1"  x:Name="FixY"  Text="0" Width="90"  Height="26"/>
+                            <CheckBox Grid.Column="2" x:Name="Par1" Margin="0,20,100,0" Content="自动保存ROI" Width="90"  Height="26" />
+                            <Button Grid.Column="3" Content="保存相机配置"  Width="120"
+                                    Height="36" Background="#2ECC71" Foreground="White" FontSize="14"
+                                    FontWeight="Bold" HorizontalAlignment="Right"  Margin="0,15,0,0" Click="BtnSave_Click"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <!-- ================================================= -->
+                <!-- 检测项目管理 -->
+                <!-- ================================================= -->
+                <Border Grid.Row="3" x:Name="ProjectContainer" Background="White" CornerRadius="8" Padding="20" Margin="10">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#DDDDDD"  BlurRadius="10" ShadowDepth="1"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- 标题 -->
+                        <TextBlock Grid.Row="0"
+                                   Text="检测项目管理区"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="#34495E"
+                                   Margin="0,0,0,15"/>
+                        <!-- 项目选择 -->
+                        <Grid Grid.Row="1" Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="当前项目："
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Foreground="#2C3E50"
+                                       Margin="0,0,10,0"/>
+                            <ComboBox Grid.Column="1"
+                                      x:Name="CmbProjects"
+                                      Width="200"
+                                      Height="36"
+                                      FontSize="14"
+                                      VerticalContentAlignment="Center"
+                                      SelectionChanged="CmbProjects_SelectionChanged"/>
+                            <Button Grid.Column="2"
+                                    Content="添加项目"
+                                    Width="80"
+                                    Height="36"
+                                    Margin="15,0,0,0"
+                                    Background="#3498DB"
+                                    Foreground="White"
+                                    Click="BtnAddProject_Click"/>
+                            <Button Grid.Column="3" 
+                                    Content="删除项目"
+                                    Width="80"
+                                    Height="36"
+                                    Margin="10,0,0,0"
+                                    Background="#E74C3C"
+                                    Foreground="White"
+                                    Click="BtnDeleteProject_Click"/>
+                        </Grid>
+                        <!-- ================================================= -->
+                        <!-- 模板图片 -->
+                        <!-- 关键：Stretch="Fill" -->
+                        <!-- ================================================= -->
+                        <Border Grid.Row="2"
+                                Background="#1E1E1E"
+                                Height="350"
+                                Width="490"
+                                CornerRadius="4"
+                                ClipToBounds="True"
+                                Margin="0,0,0,15">
+                            <Grid>
+                                <Image x:Name="ImgTemplate"
+                                       Stretch="Fill"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       SizeChanged="ImgTemplate_SizeChanged"/>
+                                <Canvas x:Name="CanvasRoi"
+                                        Background="Transparent"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        MouseDown="CanvasRoi_MouseDown"
+                                        MouseMove="CanvasRoi_MouseMove"
+                                        MouseUp="CanvasRoi_MouseUp"/>
+                            </Grid>
+                        </Border>
+                        <!-- 拍模板 -->
+                        <Grid Grid.Row="3"  Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="1"
+                                    Content="📷 拍模板图片"
+                                    Width="120"
+                                    Height="36"
+                                    Background="#9B59B6"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Click="BtnSnapTemplate_Click"/>
+                            <Button Grid.Column="2"
+                                    Content="清空 ROI 框"
+                                    Width="100"
+                                    Height="36"
+                                    Margin="10,0,0,0"
+                                    Background="#95A5A6"
+                                    Foreground="White"
+                                    Click="BtnClearRoi_Click"/>
+                        </Grid>
+                        <!-- ROI 参数 -->
+                        <Border Grid.Row="4"
+                                Background="#F8F9FA"
+                                Padding="10"
+                                CornerRadius="4"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="160"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="🎯 ROI 独立检测参数列表：" FontWeight="Bold"
+                                           FontSize="13"  Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                <DataGrid Grid.Row="1" x:Name="DgRoiParams" AutoGenerateColumns="False" CanUserAddRows="False"
+                                          SelectionMode="Single" SelectionUnit="FullRow" GridLinesVisibility="All"
+                                          HeadersVisibility="Column" Height="160">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ROI" Binding="{Binding DisplayName}" IsReadOnly="True" Width="55"/>
+                                        <DataGridTextColumn Header="X" Binding="{Binding X, StringFormat={}{0:F0}}" IsReadOnly="True" Width="40"/>
+                                        <DataGridTextColumn Header="Y" Binding="{Binding Y, StringFormat={}{0:F0}}" IsReadOnly="True" Width="40"/>
+                                        <DataGridTextColumn Header="W" Binding="{Binding Width, StringFormat={}{0:F0}}" IsReadOnly="True" Width="40"/>
+                                        <DataGridTextColumn Header="H" Binding="{Binding Height, StringFormat={}{0:F0}}" IsReadOnly="True" Width="40"/>
+                                        <!-- 检测方法 -->
+                                        <DataGridTemplateColumn Header="检测方法" Width="180">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Algorithm, Converter={StaticResource EnumDescConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox SelectedItem="{Binding Algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              ItemsSource="{Binding Source={StaticResource AlgorithmEnumValues}}"
+                                                              HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding Converter={StaticResource EnumDescConverter}}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <!-- 参数1 -->
+                                        <DataGridTemplateColumn Header="参数1设置" Width="150">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Param1Name}" Foreground="Gray" Margin="0,0,4,0"/>
+                                                        <TextBlock Grid.Column="1" Text=": " Foreground="Gray"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding ParamThreshold}" FontWeight="Bold"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <TextBox Text="{Binding ParamThreshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <!-- 参数2 -->
+                                        <DataGridTemplateColumn Header="参数2设置"  Width="150">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Param2Name}" Foreground="Gray"  Margin="0,0,4,0"/>
+                                                        <TextBlock Grid.Column="1" Text=": "  Foreground="Gray"/>
+                                                        <TextBlock Grid.Column="2"  Text="{Binding ParamRatio}"  FontWeight="Bold"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <TextBox Text="{Binding ParamRatio, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Border>
+                        <!-- 保存项目 -->
+                        <Button Grid.Row="5" Content="保 存 项 目" Height="40" Margin="0,15,0,0" Background="#2ECC71" Foreground="White" FontSize="15"  FontWeight="Bold" Click="BtnSaveProject_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+        <!-- ========================================================= -->
+        <!-- 右侧：手动测试 -->
+        <!-- ========================================================= -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <Border Background="White" CornerRadius="8"  Padding="20">
+                <Border.Effect>
+                    <DropShadowEffect Color="#DDDDDD" BlurRadius="10"  ShadowDepth="1"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- 标题 -->
+                    <TextBlock Grid.Row="0" Text="🧪 手动比对测试区" FontSize="16" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,10"/>
+                    <!-- 项目选择 -->
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="测试项目：" VerticalAlignment="Center"  FontSize="13"  Foreground="#2C3E50"/>
+                        <ComboBox Grid.Column="1"
+                                  x:Name="CmbTestProjects"
+                                  Width="120"
+                                  Height="32"
+                                  FontSize="13"
+                                  VerticalContentAlignment="Center"
+                                  Margin="5,0,10,0"
+                                  SelectionChanged="CmbTestProjects_SelectionChanged"/>
+                        <Button Grid.Column="2"
+                                Content="⚡ 执行比对检测"
+                                Height="32"
+                                Padding="15,0"
+                                Background="#E67E22"
+                                Foreground="White"
+                                FontWeight="Bold"
+                                Click="BtnRunTest_Click" VerticalAlignment="Bottom"/>
+                        <Button Grid.Column="3"
+                                Content="拍照测试图片"
+                                Height="32"
+                                Padding="15,0"
+                                Background="#2ECC71"
+                                Foreground="White"
+                                Margin="10,0,0,0"
+                                FontWeight="Bold"
+                                Click="BtnTestSample_Click"/>
+                        <Button Grid.Column="4"
+                               Content="test"
+                               Height="32"
+                               Padding="15,0"
+                               Background="#2ECC71"
+                               Foreground="White"
+                               Margin="10,0,0,0"
+                               FontWeight="Bold"
+                               Click="BtnTestSingleRoi"/>       
+                    </Grid>
+                    <!-- ================================================= -->
+                    <!-- 图像区域 -->
+                    <!-- ================================================= -->
+                    <Grid Grid.Row="2" Margin="0,5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="350"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="350"/>
+                        </Grid.RowDefinitions>
+                        <!-- ================================================= -->
+                        <!-- 模板图 -->
+                        <!-- ================================================= -->
+                        <Border Grid.Row="0"
+                                Background="#1E1E1E"
+                                Height="350"
+                                Width="490"
+                                CornerRadius="4"
+                                ClipToBounds="True"
+                                MouseLeftButtonDown="ImgTestTemplate_MouseDoubleClick">
+                            <Grid>
+                                <!-- 关键：Fill -->
+                                <Image x:Name="ImgTestTemplate"
+                                       Stretch="Fill"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       SizeChanged="ImgTestTemplate_SizeChanged"/>
+                                <Canvas x:Name="CanvasTestTemplateRoi"
+                                        Background="Transparent"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        IsHitTestVisible="False"/>
+                                <!-- 左上角标题 -->
+                                <Border VerticalAlignment="Top"
+                                        HorizontalAlignment="Left"
+                                        Background="#80000000"
+                                        Padding="8,3"
+                                        Margin="5">
+                                    <TextBlock Text="📌 模板图像 (双击更换)" Foreground="White" FontSize="11"/>
+                                </Border>
+                                <!-- 步骤信息 -->
+                                <Border x:Name="PanelStepInfo"
+                                        VerticalAlignment="Bottom"
+                                        HorizontalAlignment="Right"
+                                        Background="#CC000000"
+                                        CornerRadius="4"
+                                        Padding="10"
+                                        Margin="8"
+                                        Visibility="Collapsed"
+                                        MaxWidth="300">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0"
+                                                   x:Name="TxtStepName"
+                                                   Foreground="#00FFC0"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,4"/>
+                                        <Separator Grid.Row="1"
+                                                   Background="#444"
+                                                   Margin="0,2,0,4"/>
+                                        <TextBlock Grid.Row="2"
+                                                   Text="📥 输入参数:"
+                                                   Foreground="#AAA"
+                                                   FontSize="10"
+                                                   Margin="0,2,0,0"/>
+                                        <TextBlock Grid.Row="3"
+                                                   x:Name="TxtInputParams"
+                                                   Foreground="White"
+                                                   FontSize="11"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,4"/>
+                                        <TextBlock Grid.Row="4"
+                                                   Text="📤 输出数据:"
+                                                   Foreground="#AAA"
+                                                   FontSize="10"
+                                                   Margin="0,2,0,0"/>
+                                        <TextBlock Grid.Row="5"
+                                                   x:Name="TxtOutputData"
+                                                   Foreground="#FFD700"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <!-- ================================================= -->
+                        <!-- 待测图 -->
+                        <!-- ================================================= -->
+                        <Border Grid.Row="2"
+                                Background="#1E1E1E"
+                                Height="350"
+                                Width="490"
+                                CornerRadius="4"
+                                ClipToBounds="True">
+                            <Grid>
+                                <Grid MouseLeftButtonDown="ImgTestSample_MouseDoubleClick">
+                                    <!-- 关键：Fill -->
+                                    <Image x:Name="ImgTestSample"
+                                           Stretch="Fill"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           SizeChanged="ImgTestSample_SizeChanged"/>
+                                    <Canvas x:Name="CanvasTestSampleRoi"
+                                            Background="Transparent"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            IsHitTestVisible="False"/>
+                                    <Border VerticalAlignment="Top"  HorizontalAlignment="Left" Background="#80000000" Padding="8,3" Margin="5">
+                                        <TextBlock x:Name="TxtSampleTitle"  Text="🔍 待测图像 (双击加载本地图)"  Foreground="White" FontSize="11"/>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <!-- 判定结果 -->
+                    <Border x:Name="BorderTestResult" Grid.Row="3" Height="45" CornerRadius="4"  Background="#BDC3C7">
+                        <TextBlock x:Name="TxtTestResult" Text="等待比对测试..."  Foreground="White"  FontSize="18"
+                                   FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- 详细日志 -->
+                    <TextBox x:Name="TxtTestDetails" Grid.Row="5" Height="200" Margin="0,10,0,0"  IsReadOnly="True"
+                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#F8F9F9" Foreground="#34495E"
+                             FontSize="12"/>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</Page>
