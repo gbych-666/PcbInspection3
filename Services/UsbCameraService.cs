@@ -17,7 +17,7 @@ namespace PcbInspection.Services
         public string Name { get; set; }
         public string MonikerString { get; set; }
     }
-
+    // Camera Watchdog Test
     public class UsbCameraService : ICameraService
     {
         public event Action<BitmapSource> ImageCaptured;
